@@ -1,0 +1,20 @@
+<div class="whole-body">
+    <div class="name-field-body">
+        <mat-form-field class="name-field">
+            <mat-label>Location Name</mat-label>
+            <input matInput placeholder="E.g. Pristina Mall" [(ngModel)]="locationName">
+        </mat-form-field>
+    </div>
+    <label class="example-value-label">Radius</label>
+    <div class="radius-slider-body">
+        <mat-slider
+            class="slider"
+            [max]="150"
+            [min]="0"
+            [step]="1">
+            <input matSliderThumb [(ngModel)]="radius" #slider>
+        </mat-slider>
+        <label class="example-value-label">{{slider.value}} km</label>
+    </div>
+    <button mat-flat-button [disabled]="isSaveDisabled()" (click)="onSaveClick()">Save</button>
+</div>

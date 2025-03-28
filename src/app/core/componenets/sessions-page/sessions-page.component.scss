@@ -1,0 +1,17 @@
+.locations-body {
+    width: 100%;
+}
+
+.location-card {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    min-height: 55px;
+    margin-bottom: 7px;
+}
+
+.location-name {
+    margin-left: 5px;
+}

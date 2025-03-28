@@ -1,0 +1,29 @@
+<h1>Sessions</h1>
+<mat-accordion>
+    @for(session of sessions; track $index) {<mat-expansion-panel hideToggle>
+        <mat-expansion-panel-header>
+          <mat-panel-title> {{session.name}} </mat-panel-title>
+          <mat-panel-description> This is a summary of the content </mat-panel-description>
+        </mat-expansion-panel-header>
+        @for(locationSet of session.locationSets; track $index; let index = $index) {
+            <div class="locations-body">
+                <mat-card class="location-card">
+                    <span class="location-name">{{locationSet.addressName}} {{getLocationText(locationSet)}}</span>
+                    <div class="location-buttons">
+                        @if(locationSet.saved) {
+                            <button mat-mini-fab>
+                                <mat-icon>edit</mat-icon>
+                            </button>
+                        }
+                        <button mat-mini-fab>
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </div>
+                </mat-card>
+            </div>
+        }
+        <button mat-flat-button (click)="onNewLocationClick(session)">Add new location</button>
+      </mat-expansion-panel>
+    }
+    <button mat-flat-button (click)="onNewSessionsClick()">Add new session</button>
+</mat-accordion>
