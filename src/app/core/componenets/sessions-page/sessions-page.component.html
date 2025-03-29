@@ -1,29 +1,44 @@
-<h1>Sessions</h1>
-<mat-accordion>
-    @for(session of sessions; track $index) {<mat-expansion-panel hideToggle>
-        <mat-expansion-panel-header>
-          <mat-panel-title> {{session.name}} </mat-panel-title>
-          <mat-panel-description> This is a summary of the content </mat-panel-description>
-        </mat-expansion-panel-header>
-        @for(locationSet of session.locationSets; track $index; let index = $index) {
-            <div class="locations-body">
-                <mat-card class="location-card">
-                    <span class="location-name">{{locationSet.addressName}} {{getLocationText(locationSet)}}</span>
-                    <div class="location-buttons">
-                        @if(locationSet.saved) {
-                            <button mat-mini-fab>
-                                <mat-icon>edit</mat-icon>
-                            </button>
-                        }
-                        <button mat-mini-fab>
-                            <mat-icon>delete</mat-icon>
-                        </button>
-                    </div>
-                </mat-card>
-            </div>
+<!-- <app-map-viewer></app-map-viewer> -->
+<div class="whole-body">
+    <h1>Sessions</h1>
+    <mat-accordion style="width: 100%; text-align: center;">
+        @for(session of sessions; track $index) {
+            <mat-expansion-panel [expanded]="isPanelExpandedForSession(session)">
+                <mat-expansion-panel-header>
+                    <mat-panel-title> {{session.name}} </mat-panel-title>
+                    <mat-panel-description> {{session.description}} </mat-panel-description>
+                </mat-expansion-panel-header>
+                <div class="locations-body">
+                    @for(locationSet of session.locationSets; track $index; let index = $index) {
+                        <div class="location-body">
+                            <mat-card class="location-card">
+                                <div class="location-header">
+                                    <span class="location-name">{{locationSet.addressName}}</span>
+                                    @if(locationSet.description) {
+                                        <span class="location-description"> ({{locationSet.description}})</span>
+                                    }
+                                </div>
+                                <div class="location-buttons">
+                                    @if(locationSet.saved) {
+                                        <button mat-mini-fab>
+                                            <mat-icon>edit</mat-icon>
+                                        </button>
+                                    }
+                                    <button mat-mini-fab>
+                                        <mat-icon>delete</mat-icon>
+                                    </button>
+                                </div>
+                            </mat-card>
+                        </div>
+                    }@empty {
+                        <span class="no-sessions-disclaimer">There are currently no locations</span>
+                    }
+                    <button mat-flat-button class="new-session-button" (click)="onNewLocationClick(session)">Add new location</button>
+                </div>
+            </mat-expansion-panel>
+        }@empty {
+            <span class="no-sessions-disclaimer">There are currently no sessions</span>
         }
-        <button mat-flat-button (click)="onNewLocationClick(session)">Add new location</button>
-      </mat-expansion-panel>
-    }
-    <button mat-flat-button (click)="onNewSessionsClick()">Add new session</button>
-</mat-accordion>
+    </mat-accordion>
+    <button mat-flat-button class="new-session-button" (click)="onNewSessionsClick()">Add new session</button>
+</div>

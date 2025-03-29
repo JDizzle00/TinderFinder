@@ -1,0 +1,11 @@
+.whole-body {
+    min-width: 50vw;
+    min-height: 20vh;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+}
+
+.name-field, .description-field {
+    width: 100%;
+}

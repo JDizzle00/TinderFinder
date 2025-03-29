@@ -1,14 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { Coordinates, LocationSet, TriangulationSession } from '@core/models';
-import { GeoLocationService } from '@core/services';
+import { GeoLocationService, SessionService } from '@core/services';
 import { AppCommonModule } from 'src/app/app.common.module';
 import { NewLocationDialogComponent } from '../new-location-dialog/new-location-dialog.component';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { take } from 'rxjs';
+import { NewSessionDialogComponent } from '../new-session-dialog/new-session-dialog.component';
+import { MapViewerComponent } from "../map-viewer/map-viewer.component";
 
 @Component({
   selector: 'app-sessions-page',
-  imports: [AppCommonModule],
+  imports: [AppCommonModule, MapViewerComponent],
   templateUrl: './sessions-page.component.html',
   styleUrl: './sessions-page.component.scss'
 })
@@ -19,21 +21,27 @@ export class SessionsPageComponent implements OnInit {
 
   constructor(
     private readonly dialog: MatDialog,
-    private readonly geoLocationService: GeoLocationService
+    private readonly geoLocationService: GeoLocationService,
+    private readonly sessionService: SessionService
   ) {}
 
   ngOnInit(): void {
-    this.sessions = [{
-      name: "Test Baddie",
-      locationSets: []
-    }]
+    this.loadSessions();
     this.testTriangulation()
   }
 
+  loadSessions() : void {
+    this.sessions = this.sessionService.loadSessionsFromLocalStorage() ?? [];
+  }
+
+  saveSessions() : void {
+    this.sessionService.saveSessions(this.sessions);
+  }
+
   testTriangulation() : void {
-    const jannis: LocationSet = {coordinates: {latitude: 48.18786894380662, longitude: 11.503847044646422}, radius: 20, addressName: "Test", saved: true};
-    const david: LocationSet = {coordinates: {latitude: 48.155519934026515, longitude: 11.536818686203635}, radius: 20, addressName: "Test", saved: true};
-    const jakob: LocationSet = {coordinates: {latitude: 48.13016493283865, longitude: 11.511707881498408}, radius: 20, addressName: "Test", saved: true};
+    const jannis: LocationSet = {coordinates: {latitude: 48.18786894380662, longitude: 11.503847044646422}, radius: 20, addressName: "Test", saved: true, description: ''};
+    const david: LocationSet = {coordinates: {latitude: 48.155519934026515, longitude: 11.536818686203635}, radius: 20, addressName: "Test", saved: true, description: ''};
+    const jakob: LocationSet = {coordinates: {latitude: 48.13016493283865, longitude: 11.511707881498408}, radius: 20, addressName: "Test", saved: true, description: ''};
     console.log(this.geoLocationService.getCoordinatesFromTriangulation([jannis, david, jakob]));
   }
 
@@ -56,18 +64,29 @@ export class SessionsPageComponent implements OnInit {
     const dialogRef = this.dialog.open(NewLocationDialogComponent, dialogConfig);
     dialogRef.afterClosed().pipe(take(1)).subscribe((location: LocationSet | undefined) => {
       if(location) {
-        session.locationSets.push(location);
+        this.geoLocationService.reverseGeo(location.coordinates).then((addressName) => {
+          location.description = addressName != undefined && addressName !== '' ? addressName : this.getLocationText(location);
+          session.locationSets.push(location);
+          this.saveSessions();
+        })
       }
     })
   }
 
   onNewSessionsClick() : void {
-    // const dialogConfig = new MatDialogConfig();
-    // dialogConfig.data = { longitude: longitude, latitude: latitude };
-    // const dialogRef = this.dialog.open(NewLocationDialogComponent, dialogConfig);
-    // dialogRef.afterClosed().pipe(take(1)).subscribe((location: LocationSet | undefined) => {
-      
-    // })
+    const dialogConfig = new MatDialogConfig();
+    const dialogRef = this.dialog.open(NewSessionDialogComponent, dialogConfig);
+    dialogRef.afterClosed().pipe(take(1)).subscribe((returnSession: TriangulationSession | undefined) => {
+      if(returnSession) {
+        returnSession.expanded = true;
+        this.sessions.push(returnSession);
+        this.saveSessions();
+      }
+    })
+  }
+
+  isPanelExpandedForSession(session: TriangulationSession) : boolean {
+    return session.expanded ?? false;
   }
 
 }

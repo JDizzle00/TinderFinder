@@ -1,11 +1,18 @@
 <div class="whole-body">
+    <div class="map-body">
+        <app-map-viewer [coordinates]="coordinates"
+        [width]="400"
+        [height]="150"
+        (coordinatesClick)="onCoordinatesClick($event)"
+        ></app-map-viewer>
+    </div>
     <div class="name-field-body">
         <mat-form-field class="name-field">
-            <mat-label>Location Name</mat-label>
+            <mat-label>Location Name*</mat-label>
             <input matInput placeholder="E.g. Pristina Mall" [(ngModel)]="locationName">
         </mat-form-field>
     </div>
-    <label class="example-value-label">Radius</label>
+    <label class="example-value-label">Radius*</label>
     <div class="radius-slider-body">
         <mat-slider
             class="slider"

@@ -1,0 +1,15 @@
+<div class="whole-body">
+    <div class="name-field-body">
+        <mat-form-field class="name-field">
+            <mat-label>Session Name*</mat-label>
+            <input matInput placeholder="E.g. Stacey" [(ngModel)]="name">
+        </mat-form-field>
+    </div>
+    <div class="description-field-body">
+        <mat-form-field class="description-field">
+            <mat-label>Description</mat-label>
+            <input matInput placeholder="The tall brunette" [(ngModel)]="description">
+        </mat-form-field>
+    </div>
+    <button mat-flat-button [disabled]="isSaveDisabled()" (click)="onSaveClick()">Save</button>
+</div>

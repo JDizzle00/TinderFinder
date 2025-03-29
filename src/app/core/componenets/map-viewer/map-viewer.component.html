@@ -1,11 +1,38 @@
-<h1>Map</h1>
-<div style="height: 500px">
-  <aol-map>
-    <aol-view [zoom]="2">
-      <aol-coordinate [x]="5.795122" [y]="45.210225" [srid]="'EPSG:4326'"></aol-coordinate>
+<div>
+  <aol-map [height]="getHeight()" [width]="getWidth()" #mapComponent (onSingleClick)="onSingleClick($event)" (onClick)="onSingleClick($event)">
+    <aol-interaction-default></aol-interaction-default>
+    <aol-view [zoom]="15">
+      <aol-coordinate [x]="coordinates?.longitude ?? 0" [y]="coordinates?.latitude ?? 0" [srid]="'EPSG:4326'"></aol-coordinate>
     </aol-view>
     <aol-layer-tile>
       <aol-source-osm></aol-source-osm>
     </aol-layer-tile>
+    @if(isPointerSet()) {
+      <aol-layer-vector>
+        <aol-source-vector>
+          <aol-feature>
+            <aol-geometry-point>
+              <aol-coordinate [x]="pointerCoordinates!.longitude!" [y]="pointerCoordinates!.latitude!" [srid]="'EPSG:4326'"></aol-coordinate>
+            </aol-geometry-point>
+            <aol-style>
+              <aol-style-circle [radius]="10">
+                <aol-style-stroke [color]="'black'" [width]="1"></aol-style-stroke>
+                <aol-style-fill [color]="'green'"></aol-style-fill>
+              </aol-style-circle>
+            </aol-style>
+          </aol-feature>
+          <aol-feature>
+            <aol-geometry-point>
+              <aol-coordinate [x]="pointerCoordinates!.longitude!" [y]="pointerCoordinates!.latitude!" [srid]="'EPSG:4326'"></aol-coordinate>
+            </aol-geometry-point>
+            <aol-style>
+              <aol-style-icon [src]="markerImage" [anchor]="[0.5, 1]" [anchorXUnits]="'fraction'" [anchorYUnits]="'fraction'" [scale]="0.1"
+               [anchorOrigin]="'top-left'">
+              </aol-style-icon>
+            </aol-style>
+          </aol-feature>
+        </aol-source-vector>
+      </aol-layer-vector>
+    }
   </aol-map>
 </div>

@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Coordinates, LocationSet } from '@core/models';
-import { Observable } from 'rxjs';
+import { Observable, take } from 'rxjs';
 import * as turf from '@turf/turf';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 const GEOLOCATION_ERRORS: Record<number, string> = {
   1: 'You have rejected access to your location',
@@ -9,10 +11,14 @@ const GEOLOCATION_ERRORS: Record<number, string> = {
   3: 'Service timeout has been reached',
 };
 
+const GEO_REVERSE_SERVICE_URL = 'https://nominatim.openstreetmap.org/reverse?key={apiKey}&format=json&addressdetails=1&lat={lat}&lon={lon}';
+
 @Injectable({
   providedIn: 'root'
 })
 export class GeoLocationService {
+
+  constructor(private httpClient: HttpClient) {}
 
 
   getLocation(geoLocationOptions: PositionOptions = { timeout: 5000 }): Observable<GeolocationPosition> {
@@ -61,5 +67,36 @@ export class GeoLocationService {
     }
 
     return null;
+  }
+
+
+  reverseGeo(coordinates: Coordinates) : Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      if(!coordinates.latitude || !coordinates.longitude) {
+        return reject(new Error("Invalid coordinates: Latitude and longitude are required."));
+      }
+      const geoReverseApiKey = environment.geoReverseKey;
+      const serviceUrl = GEO_REVERSE_SERVICE_URL
+        .replace(new RegExp('{lon}', 'ig'), `${coordinates.longitude}`)
+        .replace(new RegExp('{lat}', 'ig'), `${coordinates.latitude}`)
+        .replace(new RegExp('{apiKey}', 'ig'), `${geoReverseApiKey}`)
+      this.httpClient.get(serviceUrl).pipe(take(1)).subscribe({
+        next: (data: any) => {
+          if (!data) return reject(new Error("No data received from the geolocation service."));
+    
+          const display_name = data.display_name;
+          const address = data.address ? data.address : {};
+    
+          const building = [address.building, address.mall, address.theatre].filter(Boolean).join(' ');
+          const zipCity = [address.postcode, address.city].filter(Boolean).join(' ');
+          const streetNumber = [
+            address.street, address.road, address.footway, address.pedestrian, address.house_number
+          ].filter(Boolean).join(' ');
+    
+          resolve([streetNumber, zipCity, building].filter(Boolean).join(', ') || display_name);
+        },
+        error: (err) => reject(new Error(`Reverse geocoding failed: ${err.message || err}`))
+      })
+    })
   }
 }
