@@ -36,9 +36,45 @@
 .no-sessions-disclaimer {
     font-size: x-large;
     color: #777;
+    margin-bottom: 7px;
+}
+
+.new-location-button {
+    width: 200px;
 }
 
 .new-session-button {
     width: 300px;
-    margin-top: 30px;
+    margin-top: 16px;
 }
+
+.session-action-buttons {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: flex-end;
+}
+
+.delete-session-button {
+    background-color: #8a0000 !important;
+}
+.calculate-coordinates-button {
+    background-color: #006110 !important;
+    &:disabled {
+      background-color: #cccccc !important;
+      cursor: not-allowed;
+    }
+  }
+
+  .result-map-body {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+
+  app-map-viewer {
+    width: 80%;
+    height: 300px;
+    display: block;
+  }

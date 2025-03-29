@@ -1,3 +1,4 @@
+import { Coordinates } from "./Coordinates";
 import { LocationSet } from "./LocationSet";
 
 export interface TriangulationSession {
@@ -5,4 +6,5 @@ export interface TriangulationSession {
     description?: string;
     locationSets: LocationSet[];
     expanded?: boolean;
+    result?: Coordinates;
 }

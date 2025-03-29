@@ -85,6 +85,35 @@ export class SessionsPageComponent implements OnInit {
     })
   }
 
+  onLocationDelete(sessionIndex: number, locationIndex: number) : void {
+    this.sessions[sessionIndex].locationSets.splice(locationIndex, 1);
+    this.saveSessions();
+  }
+  onSessionDelete(sessionIndex: number) : void {
+    this.sessions.splice(sessionIndex, 1);
+    this.saveSessions();
+  }
+
+  onTriangulateSession(session: TriangulationSession) : void {
+    if(this.canTriangulateSession(session)) {
+      const result = this.geoLocationService.getCoordinatesFromTriangulation(session.locationSets);
+      if(result) session.result = result;
+      this.saveSessions();
+    }
+  }
+
+  canTriangulateSession(session: TriangulationSession) : boolean {
+    return session.locationSets.length >= 3 && this.areAllLocationSetsValid(session.locationSets);
+  }
+
+  areAllLocationSetsValid(locationSets: LocationSet[]) : boolean {
+    return locationSets.every(locationSet =>
+      locationSet.coordinates.latitude !== undefined &&
+      locationSet.coordinates.longitude !== undefined &&
+      locationSet.radius !== 0
+    );
+  }
+
   isPanelExpandedForSession(session: TriangulationSession) : boolean {
     return session.expanded ?? false;
   }

@@ -1,15 +1,15 @@
 <!-- <app-map-viewer></app-map-viewer> -->
 <div class="whole-body">
     <h1>Sessions</h1>
-    <mat-accordion style="width: 100%; text-align: center;">
-        @for(session of sessions; track $index) {
+    <mat-accordion style="width: 100%; text-align: center;" [multi]="true">
+        @for(session of sessions; track $index; let sessionIndex = $index) {
             <mat-expansion-panel [expanded]="isPanelExpandedForSession(session)">
                 <mat-expansion-panel-header>
                     <mat-panel-title> {{session.name}} </mat-panel-title>
                     <mat-panel-description> {{session.description}} </mat-panel-description>
                 </mat-expansion-panel-header>
                 <div class="locations-body">
-                    @for(locationSet of session.locationSets; track $index; let index = $index) {
+                    @for(locationSet of session.locationSets; track $index; let locationIndex = $index) {
                         <div class="location-body">
                             <mat-card class="location-card">
                                 <div class="location-header">
@@ -25,7 +25,7 @@
                                         </button>
                                     }
                                     <button mat-mini-fab>
-                                        <mat-icon>delete</mat-icon>
+                                        <mat-icon (click)="onLocationDelete(sessionIndex, locationIndex)">delete</mat-icon>
                                     </button>
                                 </div>
                             </mat-card>
@@ -33,8 +33,21 @@
                     }@empty {
                         <span class="no-sessions-disclaimer">There are currently no locations</span>
                     }
-                    <button mat-flat-button class="new-session-button" (click)="onNewLocationClick(session)">Add new location</button>
+                    <button mat-flat-button class="new-location-button" (click)="onNewLocationClick(session)">Add new location</button>
+                    <div class="session-action-buttons">
+                        <button mat-flat-button class="delete-session-button" (click)="onSessionDelete(sessionIndex)">Delete Session</button>
+                        <button mat-flat-button class="calculate-coordinates-button" (click)="onTriangulateSession(session)"
+                        [disabled]="!canTriangulateSession(session)">Triangulate Coordinates</button>
+                    </div>
                 </div>
+                @if(session.result) {
+                    <div class="result-map-body">
+                        <app-map-viewer
+                            [coordinates]="session.result"
+                            [allowSettingPointer]="false"
+                        ></app-map-viewer>
+                    </div>
+                }
             </mat-expansion-panel>
         }@empty {
             <span class="no-sessions-disclaimer">There are currently no sessions</span>

@@ -1,9 +1,10 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { Coordinates } from '@core/models';
 import {AngularOpenlayersModule, MapComponent} from "ng-openlayers";
 import { transform } from 'ol/proj';
-import MapBrowserEvent from 'ol/MapBrowserEvent';
 import { marker } from './marker.image';
+import { Circle } from 'ol/geom';
+import * as ol from 'ng-openlayers';
 
 @Component({
   selector: 'app-map-viewer',
@@ -23,8 +24,10 @@ export class MapViewerComponent implements AfterViewInit {
     }
   }
 
-  @Input() height = 500;
-  @Input() width = 100;
+  @Input() height?: number;
+  @Input() width?: number;
+  @Input() radius = 0;
+  @Input() allowSettingPointer = true;
   @Output() coordinatesClick: EventEmitter<Coordinates> = new EventEmitter<Coordinates>;
   @ViewChild('mapComponent') mapComponent!: MapComponent;
 
@@ -41,9 +44,11 @@ export class MapViewerComponent implements AfterViewInit {
   }
   
   onSingleClick(event: any) {
-    const lonlat = transform(event.coordinate, 'EPSG:3857', 'EPSG:4326')
-    this.pointerCoordinates = {longitude: lonlat[0], latitude: lonlat[1]};
-    this.coordinatesClick.emit(this.pointerCoordinates);
+    if(this.allowSettingPointer) {
+      const lonlat = transform(event.coordinate, 'EPSG:3857', 'EPSG:4326')
+      this.pointerCoordinates = {longitude: lonlat[0], latitude: lonlat[1]};
+      this.coordinatesClick.emit(this.pointerCoordinates);
+    }
   }
 
   isPointerSet() : boolean {
@@ -53,11 +58,26 @@ export class MapViewerComponent implements AfterViewInit {
     return false;
   }
 
+  
+  getRadiusGeometry() {
+    if (this.coordinates && this.coordinates.latitude && this.coordinates.longitude && this.radius) {
+      return new Circle(
+        [this.coordinates.longitude, this.coordinates.latitude],
+        this.radius
+      );
+    }
+    return null;
+  }
+
+  initMap() : void {
+    
+  }
+
   getHeight() : string {
-    return this.height + 'px';
+    return this.height ? this.height + 'px' : '';
   }
   getWidth() : string {
-    return this.width + 'px';
+    return this.width ? this.width + 'px' : '';
   }
 
 }
